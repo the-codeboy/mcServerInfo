@@ -86,7 +86,7 @@ while True:
             print(f"player online: {players}")
         # if not online:
         #  sendWebhook("server online again")
-        time.sleep(1)
+        time.sleep(5)
         online = True
     except:
         print("connecting failed")
