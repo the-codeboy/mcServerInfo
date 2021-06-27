@@ -9,34 +9,41 @@ file_name = "data.json"
 
 global server
 global webhook_url
-
-if os.path.exists(file_name):
-    with open(file_name) as json_file:
-        data = json.load(json_file)
-        if "serverName" in data and "url" in data:
-            server_name = data["serverName"]
-            webhook_url = data["url"]
-else:
-    server_name = input("please enter the ip of the server")
-    webhook_url = input("please enter the url of the discord webhook")
-    data = {"serverName": server_name, "url": webhook_url}
-    with open(file_name, 'w') as outfile:
-        json.dump(data, outfile)
-print(F"server ip: {server_name}")
-print(F"webhook url: {webhook_url}")
-server = MinecraftServer.lookup(server_name)
-
 players_online = 0
 player_sample = []
 online = False
-try:
-    status = server.status()
-    players_online = status.players.online
-    player_sample = status.players.sample
-    online = True
-    print(f"player online: {players_online}")
-except Exception:
-    print("can not connect to server")
+
+
+def init():
+    global server
+    global webhook_url
+    if os.path.exists(file_name):
+        with open(file_name) as json_file:
+            data = json.load(json_file)
+            if "serverName" in data and "url" in data:
+                server_name = data["serverName"]
+                webhook_url = data["url"]
+    else:
+        server_name = input("please enter the ip of the server")
+        webhook_url = input("please enter the url of the discord webhook")
+        data = {"serverName": server_name, "url": webhook_url}
+        with open(file_name, 'w') as outfile:
+            json.dump(data, outfile)
+    print(F"server ip: {server_name}")
+    print(F"webhook url: {webhook_url}")
+    server = MinecraftServer.lookup(server_name)
+    try:
+        global players_online
+        global player_sample
+        global online
+        status = server.status()
+        players_online = status.players.online
+        player_sample = status.players.sample
+        online = True
+        print(f"player online: {players_online}")
+    except Exception as e:
+        print(e)
+        print("connecting failed")
 
 
 def send_webhook(text, player=None):
@@ -77,21 +84,31 @@ def send_player_change(new_players):
     player_sample = new_players
 
 
-while True:
-    try:
-        status = server.status()
-        players = status.players.online
-        players_online = players
-        send_player_change(status.players.sample)
-        if players != players_online:
-            print(f"player online: {players}")
-        # if not online:
-        #  send_webhook("server online again")
-        time.sleep(5)
-        online = True
-    except Exception:
-        print("connecting failed")
-        # if online:
-        #  send_webhook("server offline")
-        online = False
-        time.sleep(5)
+def start():
+    global players_online
+    global player_sample
+    global online
+    while True:
+        try:
+            status = server.status()
+            players = status.players.online
+            players_online = players
+            send_player_change(status.players.sample)
+            if players != players_online:
+                print(f"player online: {players}")
+            # if not online:
+            #  send_webhook("server online again")
+            time.sleep(5)
+            online = True
+        except Exception as e:
+            print(e)
+            print("connecting failed")
+            # if online:
+            #  send_webhook("server offline")
+            online = False
+            time.sleep(5)
+
+
+if __name__ == '__main__':
+    init()
+    start()
