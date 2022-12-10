@@ -8,5 +8,5 @@ This is a simple python script allowing you to automatically recieve discord mes
 
 There´s not really much to say about this
 
-You can download the file main.py (make sure to have the requirements from requirements.txt) and just run it
+You can download the file main.py (make sure to have the requirements from requirements.txt eg using ```pip install -r requirements.txt```) and just run it
 you will be asked to enter the ip of the minecraft server and the url of a discord webhook
